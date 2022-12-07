@@ -1,0 +1,10 @@
+{
+  "fabric-0" : {
+    "@type": "fabric",
+    "walletPath": "/etc/blockchain_gateway/config/authenticity_service/connection_profiles/network1/wallet1",
+    "userName": "user1",
+    "mspID": "siteAMSP",
+    "mspPath": "/etc/blockchain_gateway/config/authenticity_service/connection_profiles/network1/msp",
+    "connectionProfilePath": "/etc/blockchain_gateway/config/authenticity_service/connection_profiles/network1/connection-site-a.json"
+  }
+}

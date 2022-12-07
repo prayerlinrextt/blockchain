@@ -1,0 +1,14 @@
+{
+    "logging":"WARN",
+    "service" : {
+        "port": 8080,
+        "basepath": "/api/v1"
+    },
+    "batch_commit": {
+        "size": 2,
+        "timeout_in_ms": 100
+    },
+    "thread_pool_size": 5
+}
+
+
