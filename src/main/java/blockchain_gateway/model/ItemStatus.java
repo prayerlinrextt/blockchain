@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 @JsonDeserialize(using = CustomMedicalRecordStatusDeserializer.class)
-public class MedicalRecordStatus {
+public class ItemStatus {
 
 	private String id;
 
@@ -28,7 +28,7 @@ public class MedicalRecordStatus {
 
 	private Status status;
 
-	public MedicalRecordStatus(String id) {
+	public ItemStatus(String id) {
 		this.id = id;
 		status = Status.NOT_FOUND;
 	}

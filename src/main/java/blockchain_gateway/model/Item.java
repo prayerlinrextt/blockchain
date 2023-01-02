@@ -2,7 +2,7 @@ package blockchain_gateway.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class MedicalRecord {
+public class Item {
 
 	private String id;
 
