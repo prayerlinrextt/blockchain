@@ -18,7 +18,7 @@ import blockchain_gateway.model.MedicalRecordStatus;
 
 public class FabricAdapter implements BlockchainAdapter {
 	private static final String CHANNEL_NAME = "channelsiteasiteb";
-	private static final String CHAINCODE_NAME = "Authenticity";
+	private static final String CHAINCODE_NAME = "record_ledger";
 	private String blockchainId;
 	private static final Logger logger = LoggerFactory.getLogger(FabricAdapter.class);
 	public GatewayManager m_GatewayManager;
@@ -44,7 +44,7 @@ public class FabricAdapter implements BlockchainAdapter {
 	@Override
 	public Boolean submitRecord(MedicalRecord record) throws Exception {
 		try {
-			logger.info("Submitting a medical record into Blockchain ..");
+			logger.info("Submitting a record into Blockchain ..");
 			Contract contract = GatewayManager.getInstance().getContract(blockchainId, CHANNEL_NAME, CHAINCODE_NAME);
 			byte[] resultAsBytes = contract.submitTransaction("AddRecord", record.getId(), record.getHash(),
 					record.getTime(), record.getData());
@@ -62,7 +62,7 @@ public class FabricAdapter implements BlockchainAdapter {
 	@Override
 	public Boolean submitBulkRecords(List<MedicalRecord> records) throws Exception {
 		try {
-			logger.info("Submitting bulk medical records into Blockchain ..");
+			logger.info("Submitting bulk records into Blockchain ..");
 			ObjectWriter ow = new ObjectMapper().writerFor(new TypeReference<List<MedicalRecord>>() {
 			});
 			String payload = ow.writeValueAsString(records);
@@ -99,14 +99,14 @@ public class FabricAdapter implements BlockchainAdapter {
 				return statusMapper.readValue(stringResult);
 			}
 		} catch (Exception e) {
-			throw new Exception("Cannot validate medical records. Reason: " + e.getMessage());
+			throw new Exception("Cannot validate records. Reason: " + e.getMessage());
 		}
 	}
 
 	@Override
 	public String queryStatus(String parameter) throws Exception {
 		try {
-			logger.info("Get a medical record from blockchain ..");
+			logger.info("Get a record from blockchain ..");
 			Contract contract = GatewayManager.getInstance().getContract(blockchainId, CHANNEL_NAME, CHAINCODE_NAME);
 
 			byte[] Result = contract.evaluateTransaction("ViewRecord", parameter);
@@ -114,7 +114,7 @@ public class FabricAdapter implements BlockchainAdapter {
 			String stringResult = new String(Result);
 			return stringResult;
 		} catch (Exception e) {
-			final String msg = String.format("Cannot retrieve the medical record. Details: %s", e.getMessage());
+			final String msg = String.format("Cannot retrieve the record. Details: %s", e.getMessage());
 			logger.error(msg);
 			return "";
 		}
