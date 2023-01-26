@@ -78,6 +78,5 @@ public class ConnectionProfilesManager {
 
 	public Set<String> getblockchainIds() {
 		return connectionProfilesMap.keySet();
-
 	}
 }
