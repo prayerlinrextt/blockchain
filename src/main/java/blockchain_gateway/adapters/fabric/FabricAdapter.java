@@ -13,8 +13,8 @@ import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
 
 import blockchain_gateway.adapters.BlockchainAdapter;
-import blockchain_gateway.model.MedicalRecord;
-import blockchain_gateway.model.MedicalRecordStatus;
+import blockchain_gateway.model.Item;
+import blockchain_gateway.model.ItemStatus;
 
 public class FabricAdapter implements BlockchainAdapter {
 	private static final String CHANNEL_NAME = "channelsiteasiteb";
@@ -42,7 +42,7 @@ public class FabricAdapter implements BlockchainAdapter {
 	}
 
 	@Override
-	public Boolean submitRecord(MedicalRecord record) throws Exception {
+	public Boolean submitRecord(Item record) throws Exception {
 		try {
 			logger.info("Submitting a record into Blockchain ..");
 			Contract contract = GatewayManager.getInstance().getContract(blockchainId, CHANNEL_NAME, CHAINCODE_NAME);
@@ -60,10 +60,10 @@ public class FabricAdapter implements BlockchainAdapter {
 	}
 
 	@Override
-	public Boolean submitBulkRecords(List<MedicalRecord> records) throws Exception {
+	public Boolean submitBulkRecords(List<Item> records) throws Exception {
 		try {
 			logger.info("Submitting bulk records into Blockchain ..");
-			ObjectWriter ow = new ObjectMapper().writerFor(new TypeReference<List<MedicalRecord>>() {
+			ObjectWriter ow = new ObjectMapper().writerFor(new TypeReference<List<Item>>() {
 			});
 			String payload = ow.writeValueAsString(records);
 			Contract contract = GatewayManager.getInstance().getContract(blockchainId, CHANNEL_NAME, CHAINCODE_NAME);
@@ -80,10 +80,10 @@ public class FabricAdapter implements BlockchainAdapter {
 	}
 
 	@Override
-	public List<MedicalRecordStatus> validateRecords(List<MedicalRecord> records) throws Exception {
+	public List<ItemStatus> validateRecords(List<Item> records) throws Exception {
 		try {
-			logger.info("Validating medical records ..");
-			ObjectWriter ow = new ObjectMapper().writerFor(new TypeReference<List<MedicalRecord>>() {
+			logger.info("Validating Item records ..");
+			ObjectWriter ow = new ObjectMapper().writerFor(new TypeReference<List<Item>>() {
 			});
 			String payload = ow.writeValueAsString(records);
 			Contract contract = GatewayManager.getInstance().getContract(blockchainId, CHANNEL_NAME, CHAINCODE_NAME);
@@ -94,7 +94,7 @@ public class FabricAdapter implements BlockchainAdapter {
 				return null;
 			else {
 				ObjectReader statusMapper = new ObjectMapper()
-						.readerFor(new TypeReference<List<MedicalRecordStatus>>() {
+						.readerFor(new TypeReference<List<ItemStatus>>() {
 						});
 				return statusMapper.readValue(stringResult);
 			}
