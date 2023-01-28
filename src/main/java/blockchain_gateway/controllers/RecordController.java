@@ -10,7 +10,7 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import blockchain_gateway.management.BlockchainManager;
-import blockchain_gateway.model.MedicalRecord;
+import blockchain_gateway.model.Item;
 
 import java.net.URI;
 
@@ -32,7 +32,7 @@ public class RecordController {
 	BlockchainManager blockchainManager;
 
 	@PostMapping("/record")
-	ResponseEntity<?> newRecord(@RequestBody MedicalRecord newRecord, UriComponentsBuilder ucb) {
+	ResponseEntity<?> newRecord(@RequestBody Item newRecord, UriComponentsBuilder ucb) {
 		if(newRecord.getHash()==null){
 			logger.error("Failed to add record !!");
 			return new ResponseEntity<>("Hash field is mandatory and cannot be null !!",HttpStatus.BAD_REQUEST);

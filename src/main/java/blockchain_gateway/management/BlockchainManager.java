@@ -23,8 +23,8 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 
 import blockchain_gateway.adapters.AdapterManager;
 import blockchain_gateway.connectionprofiles.ConnectionProfilesManager;
-import blockchain_gateway.model.MedicalRecord;
-import blockchain_gateway.model.MedicalRecordStatus;
+import blockchain_gateway.model.Item;
+import blockchain_gateway.model.ItemStatus;
 import blockchain_gateway.model.Status;
 
 @Component
@@ -63,12 +63,12 @@ public class BlockchainManager {
 	 * 
 	 * @param payload
 	 */
-	public Boolean addRecord(MedicalRecord record) {
+	public Boolean addRecord(Item record) {
 		try {
 			BatchTransactionExecutor.getInstance().addRecord(record);
 			return true;
 		} catch (Exception e) {
-			logger.error("Failed to add medical record. Reason: " + e.getMessage());
+			logger.error("Failed to add record. Reason: " + e.getMessage());
 			return false;
 		}
 	}
@@ -84,10 +84,10 @@ public class BlockchainManager {
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public String validateRecords(List<MedicalRecord> records) {
+	public String validateRecords(List<Item> records) {
 		try {
 			Object mutex = new Object();
-			List<MedicalRecordStatus> recordStatus = records.stream().map(p -> new MedicalRecordStatus(p.getId()))
+			List<ItemStatus> recordStatus = records.stream().map(p -> new ItemStatus(p.getId()))
 					.collect(Collectors.toList());
 
 			var blockchainIds = ConnectionProfilesManager.getInstance().getblockchainIds();
@@ -99,16 +99,16 @@ public class BlockchainManager {
 			futureList.forEach(future -> {
 				synchronized (mutex) {
 					try {
-						List<MedicalRecordStatus> status = (List<MedicalRecordStatus>) future.get();
-						List<MedicalRecordStatus> recordsWithNonValidStatus = recordStatus.stream().filter(c -> {
+						List<ItemStatus> status = (List<ItemStatus>) future.get();
+						List<ItemStatus> recordsWithNonValidStatus = recordStatus.stream().filter(c -> {
 							if (c.getStatus() != Status.VALID && c.getStatus() != Status.IN_VALID)
 								return true;
 							else
 								return false;
 						}).collect(Collectors.toList());
 						if (recordsWithNonValidStatus != null) {
-							for (MedicalRecordStatus temp : recordsWithNonValidStatus) {
-								MedicalRecordStatus record = status.stream()
+							for (ItemStatus temp : recordsWithNonValidStatus) {
+								ItemStatus record = status.stream()
 										.filter(objcet -> temp.getId().equals(objcet.getId())).findAny().orElse(null);
 								if (record.getStatus() != Status.NOT_FOUND)
 									temp.setStatus(record.getStatus());
@@ -120,11 +120,11 @@ public class BlockchainManager {
 				}
 			});
 			futureList.forEach(CompletableFuture::join);
-			ObjectWriter ow = new ObjectMapper().writerFor(new TypeReference<List<MedicalRecordStatus>>() {
+			ObjectWriter ow = new ObjectMapper().writerFor(new TypeReference<List<ItemStatus>>() {
 			});
 			return ow.writeValueAsString(recordStatus);
 		} catch (Exception e) {
-			logger.error("Failed to validate medical records. Reason: " + e.getMessage());
+			logger.error("Failed to validate records. Reason: " + e.getMessage());
 			return "";
 		}
 	}
@@ -143,26 +143,26 @@ public class BlockchainManager {
 			}
 			return record;
 		} catch (Exception e) {
-			logger.error("Failed to retrieve medical record. Reason: " + e.getMessage());
+			logger.error("Failed to retrieve record. Reason: " + e.getMessage());
 			throw e;
 		}
 	}
 
-	private List<MedicalRecordStatus> validateByAdapter(String blockchainId, List<MedicalRecord> records) {
+	private List<ItemStatus> validateByAdapter(String blockchainId, List<Item> records) {
 		try {
 			return AdapterManager.getInstance().getAdapter(blockchainId).validateRecords(records);
 		} catch (Exception e) {
-			logger.error("Failed to validate medical records in blockchain ID %s. Reason: %s", blockchainId,
+			logger.error("Failed to validate records in blockchain ID %s. Reason: %s", blockchainId,
 					e.getMessage());
 			return null;
 		}
 	}
 
 	@SuppressWarnings({ "rawtypes" })
-	public String validateRemoteRecords(List<MedicalRecord> records) {
+	public String validateRemoteRecords(List<Item> records) {
 		try {
 			Object mutex = new Object();
-			List<MedicalRecordStatus> recordStatus = records.stream().map(p -> new MedicalRecordStatus(p.getId()))
+			List<ItemStatus> recordStatus = records.stream().map(p -> new ItemStatus(p.getId()))
 					.collect(Collectors.toList());
 
 			var blockchainIds = SiteEndPointManager.getInstance().getSiteIDs();
@@ -176,18 +176,18 @@ public class BlockchainManager {
 					try {
 						String ret = (String) future.get();
 						ObjectReader statusMapper = new ObjectMapper()
-								.readerFor(new TypeReference<List<MedicalRecordStatus>>() {
+								.readerFor(new TypeReference<List<ItemStatus>>() {
 								});
-						List<MedicalRecordStatus> status = statusMapper.readValue(ret);
-						List<MedicalRecordStatus> recordsWithNonValidStatus = recordStatus.stream().filter(c -> {
+						List<ItemStatus> status = statusMapper.readValue(ret);
+						List<ItemStatus> recordsWithNonValidStatus = recordStatus.stream().filter(c -> {
 							if (c.getStatus() != Status.VALID && c.getStatus() != Status.IN_VALID)
 								return true;
 							else
 								return false;
 						}).collect(Collectors.toList());
 						if (recordsWithNonValidStatus != null) {
-							for (MedicalRecordStatus temp : recordsWithNonValidStatus) {
-								MedicalRecordStatus record = status.stream()
+							for (ItemStatus temp : recordsWithNonValidStatus) {
+								ItemStatus record = status.stream()
 										.filter(objcet -> temp.getId().equals(objcet.getId())).findAny().orElse(null);
 								if (record.getStatus() != Status.NOT_FOUND)
 									temp.setStatus(record.getStatus());
@@ -199,20 +199,20 @@ public class BlockchainManager {
 				}
 			});
 			futureList.forEach(CompletableFuture::join);
-			ObjectWriter ow = new ObjectMapper().writerFor(new TypeReference<List<MedicalRecordStatus>>() {
+			ObjectWriter ow = new ObjectMapper().writerFor(new TypeReference<List<ItemStatus>>() {
 			});
 			return ow.writeValueAsString(recordStatus);
 		} catch (Exception e) {
-			logger.error("Failed to validate medical records. Reason: " + e.getMessage());
+			logger.error("Failed to validate records. Reason: " + e.getMessage());
 			return "";
 		}
 	}
 
-	public String validateRecordsOnSite(String siteID, List<MedicalRecord> records) {
+	public String validateRecordsOnSite(String siteID, List<Item> records) {
 		try {
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.APPLICATION_JSON);
-			HttpEntity<List<MedicalRecord>> entity = new HttpEntity<List<MedicalRecord>>(records, headers);
+			HttpEntity<List<Item>> entity = new HttpEntity<List<Item>>(records, headers);
 			String endpoint = SiteEndPointManager.getInstance().getEndpoint(siteID) + "/validate";
 			return restTemplate.exchange(endpoint, HttpMethod.POST, entity, String.class).getBody();
 		} catch (Exception ex) {

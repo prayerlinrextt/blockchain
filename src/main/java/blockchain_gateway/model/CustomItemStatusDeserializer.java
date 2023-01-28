@@ -8,25 +8,25 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 
-public class CustomMedicalRecordStatusDeserializer extends StdDeserializer<MedicalRecordStatus> {
+public class CustomItemStatusDeserializer extends StdDeserializer<ItemStatus> {
 
 	private static final long serialVersionUID = -3287725521124570024L;
 
-	public CustomMedicalRecordStatusDeserializer() {
+	public CustomItemStatusDeserializer() {
 		this(null);
 	}
 
-	public CustomMedicalRecordStatusDeserializer(Class<?> c) {
+	public CustomItemStatusDeserializer(Class<?> c) {
 		super(c);
 	}
 
 	@Override
-	public MedicalRecordStatus deserialize(JsonParser jsonParser, DeserializationContext ctxt)
+	public ItemStatus deserialize(JsonParser jsonParser, DeserializationContext ctxt)
 			throws IOException, JsonProcessingException {
 		JsonNode node = jsonParser.getCodec().readTree(jsonParser);
 
 		String id = node.get("id").asText();
-		MedicalRecordStatus obj = new MedicalRecordStatus(id);
+		ItemStatus obj = new ItemStatus(id);
 		String status = node.get("status").asText();
 		if (status.equals("Valid"))
 			obj.setStatus(Status.VALID);

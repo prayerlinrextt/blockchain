@@ -20,12 +20,12 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 
 import blockchain_gateway.adapters.AdapterManager;
 import blockchain_gateway.config.StartupConfig;
-import blockchain_gateway.model.MedicalRecord;
+import blockchain_gateway.model.Item;
 
 public class BatchTransactionExecutor implements Runnable {
 
 	private static final Logger logger = LoggerFactory.getLogger(BatchTransactionExecutor.class);
-	private LinkedBlockingQueue<MedicalRecord> queue = new LinkedBlockingQueue<>();
+	private LinkedBlockingQueue<Item> queue = new LinkedBlockingQueue<>();
 	private static BatchTransactionExecutor instance = null;
 	public static final int POOL_COUNT = 5;
 	private int commitSize;
@@ -58,7 +58,7 @@ public class BatchTransactionExecutor implements Runnable {
 				flushLock.lock();
 				flushCondition.await(commitTimeout, TimeUnit.MILLISECONDS);
 
-				final List<MedicalRecord> toFLush = new ArrayList<>();
+				final List<Item> toFLush = new ArrayList<>();
 				queue.drainTo(toFLush);
 
 				if (!toFLush.isEmpty()) {
@@ -88,7 +88,7 @@ public class BatchTransactionExecutor implements Runnable {
 
 	}
 
-	public void addRecord(MedicalRecord record) {
+	public void addRecord(Item record) {
 		try {
 			logger.debug("Adding record into queue ..");
 			Instant instant = Instant.now();
@@ -127,7 +127,7 @@ public class BatchTransactionExecutor implements Runnable {
 	public Boolean isPendingRecord(String id) {
 		try {
 			flushLock.lock();
-			Iterator<MedicalRecord> iterator = queue.iterator();
+			Iterator<Item> iterator = queue.iterator();
 			// Returns an iterator over the elements
 			while (iterator.hasNext()) {
 				if (id.equals(iterator.next().getId())) {
